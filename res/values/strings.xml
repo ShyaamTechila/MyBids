@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MyBids</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="Forgot_Pass">Enter Your Registered User_Id/Email_Id</string>
+    <string name="Forgot_Pass1">Dont remember your Password</string>
+    
+</resources>
