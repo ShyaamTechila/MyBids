@@ -6,6 +6,6 @@
     <string name="hello_world">Hello world!</string>
 
     <string name="Forgot_Pass">Enter Your Registered User_Id/Email_Id</string>
-    <string name="Forgot_Pass1">Dont remember your Password</string>
+    <string name="Forgot_Pass1">Dont remember your Password?</string>
     
 </resources>

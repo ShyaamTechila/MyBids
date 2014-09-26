@@ -4,22 +4,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
-
 import com.techila.mybids.Params.RegFieldParams;
 
 public class AppWebService {
@@ -101,4 +106,74 @@ public class AppWebService {
 		return null;
 	}
 	
+		public String verifyLogin(RegFieldParams fieldParams) {
+			// Create a new HttpClient and Post Header
+		    HttpClient httpclient = new DefaultHttpClient();
+		    HttpPost httppost = new HttpPost("http://phbjharkhand.in/Reverseauction/web/app_dev.php/UserLogin");
+
+		    try {
+		        // Add your data
+		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+	            nameValuePairs.add(new BasicNameValuePair("email", fieldParams.email));
+	            nameValuePairs.add(new BasicNameValuePair("password", fieldParams.passw));
+	            
+		        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		        
+		        ResponseHandler<String> responseHandler=new BasicResponseHandler();
+		        String responseBody = httpclient.execute(httppost, responseHandler);
+		        try {
+					 response=new JSONObject(responseBody);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        
+		        Log.e("respose in part", response.toString());
+		        return responseBody;
+		        
+	        } catch (ClientProtocolException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+			
+			return null;
+		}
+		
+		public String mailLoginDetails(RegFieldParams fieldParams) {
+	
+		    HttpClient httpclient = new DefaultHttpClient();
+		    HttpPost httppost = new HttpPost("http://phbjharkhand.in/Reverseauction/web/app_dev.php/ForgetPassword");
+
+		    
+		    try {
+		        // Add your data
+		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+	            nameValuePairs.add(new BasicNameValuePair("email", fieldParams.email));
+	            
+	            
+		        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		        
+		        ResponseHandler<String> responseHandler=new BasicResponseHandler();
+		        String responseBody = httpclient.execute(httppost, responseHandler);
+		        try {
+					 response=new JSONObject(responseBody);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        
+		        Log.e("respose in part", response.toString());
+		        return responseBody;
+		        
+	        } catch (ClientProtocolException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+			
+			return null;
+
+		}
+		
 }
