@@ -30,6 +30,7 @@ public class Login extends Activity {
 	 TextView signup, forgot;
 	 String emailid, passw;
 	 EditText email1,pass1;
+	 int logn = 0;
 	 
 		private static final Pattern EMAIL_PATTERN = Pattern
 				.compile("[a-zA-Z0-9+._%-+]{1,100}" + "@"
@@ -80,9 +81,36 @@ public class Login extends Activity {
 						.getUsrId();
 				fieldParams.email = email1.getText().toString();
 				fieldParams.passw = pass1.getText().toString();
+				
+				if(fieldParams.email == "")
+				{
+					email1.setError("Email is required!");
+					logn = 1;
+				}
+				else {
+					logn = 0;
+					if (!CheckEmail(fieldParams.email)) {
+						email1.setError( "Invalid Email!" );
+						logn = 1;
+					}
+				}
+				
+				
+				if(logn == 0){
 				LoginTask loginTask = new LoginTask();
 				loginTask.execute(fieldParams);
+				}
+				else {
+					
+				}
 			}
+			
+			private boolean CheckEmail(String email) {
+
+				return EMAIL_PATTERN.matcher(email).matches();
+			}
+			
+			
 		});
 		
 		signup.setOnClickListener(new OnClickListener() {
@@ -111,16 +139,37 @@ public class Login extends Activity {
 
 							@Override
 							public void onClick(View v) {
-								dialog.dismiss();
+								
+								
+								
 								EditText editEmail = (EditText) dialog
 										.findViewById(R.id.editForgEmail);
 								fieldParams.email = editEmail.getText()
 										.toString().trim();
 								
+								if(fieldParams.email == "")
+								{
+									editEmail.setError("Email is required!");
+								}
+								else {
+									if (!CheckEmail(fieldParams.email)) {
+										editEmail.setError( "Invalid Email!" );
+										
+									}
+								}
+								
 								Log.e("email", fieldParams.email);
 								MailLoginDetailsTask loginDetailsTask = new MailLoginDetailsTask();
 								loginDetailsTask.execute(fieldParams);
+								
+								dialog.dismiss();
 							}
+							
+							private boolean CheckEmail(String email) {
+
+								return EMAIL_PATTERN.matcher(email).matches();
+							}
+							
 						});
 				dialog.show();
 			}
@@ -165,7 +214,7 @@ protected void onPostExecute(String result) {
 		        Log.e("errorCode", "" + errorCode);
 		    
 		        if (errorCode == 0){
-		        	Toast.makeText(Login.this, "Password Change Successfully",Toast.LENGTH_LONG).show();
+		        	Toast.makeText(Login.this, "Password Change Successfully, Please check for our mail.",Toast.LENGTH_LONG).show();
 		        }
 		 }
 	
@@ -234,9 +283,9 @@ protected void onPostExecute(String result) {
 				        			
 				        			
 				        			
-				        			/*Intent in1 = new Intent(Registration.this,Login.class);
+				        			Intent in1 = new Intent(Login.this,BidderHome.class);
 				        			startActivity(in1);
-				        			finish();*/
+				        			finish();
 				        			
 				        		}
 				        }

@@ -1,253 +1,121 @@
 package com.example.mybids;
 
 
-import java.text.BreakIterator;
-import java.util.regex.Pattern;
+import info.android.customlistviewvolley.adater.CustomListAdapter;
+import info.android.customlistviewvolley.app.AppController;
 
-import org.json.JSONException;
+import com.example.mybids.Product;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.ListView;
 
-import com.techila.mybids.Utils.*;
-import com.techila.mybids.Params.RegFieldParams;
-import com.techila.mybids.Webservice.AppWebService;
+import com.android.volley.Request.Method;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 
 public class BidderHome extends Activity {
 	
-	 Button btn1, btn2;
-	 	private EditText edit_email;
-		private EditText edit_cpassw;
-		private EditText edit_fname;
-		private EditText edit_lname;
-		private EditText edit_zipcode;
-		private EditText edit_city;
-		private EditText edit_state;
-		private EditText edit_country;
-		private EditText edit_phnum;
-		private EditText edit_usertype;
-		
-		int vali = 0; 
-		
-		private static final Pattern EMAIL_PATTERN = Pattern
-				.compile("[a-zA-Z0-9+._%-+]{1,100}" + "@"
-						+ "[a-zA-Z0-9][a-zA-Z0-9-]{0,10}" + "(" + "."
-						+ "[a-zA-Z0-9][a-zA-Z0-9-]{0,20}"+
-			              ")+");
-		private static final Pattern USERNAME_PATTERN = Pattern
-				.compile("[a-zA-Z0-9]{1,250}");
-		private static final Pattern PASSWORD_PATTERN = Pattern
-				.compile("[a-zA-Z0-9+_.]{4,16}");
-		private static final Pattern ALPHANUMERIC = Pattern
-				.compile("^[a-zA-Z0-9]*$");
+	String tag_json_obj = "json_obj_req";
+	private String TAG = BidderHome.class.getSimpleName();
+	 
+	private List<Product> productList = new ArrayList<Product>();
+	private ListView listView;
+	private CustomListAdapter adapter;
+	String url = "http://phbjharkhand.in/Reverseauction/web/app_dev.php/ProductListing";
 		
 		
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.reg);
+		setContentView(R.layout.bidderhome);
 		
-		btn1 = (Button) findViewById(R.id.login);
+		listView = (ListView) findViewById(R.id.prodlist);
+		adapter = new CustomListAdapter(this, productList);
+		listView.setAdapter(adapter);
 		
-		edit_fname = (EditText) findViewById(R.id.fname);
-		edit_lname = (EditText) findViewById(R.id.lname);
-		edit_email = (EditText) findViewById(R.id.editemail);
-		
-		edit_usertype = (EditText) findViewById(R.id.editutype);
-		
-		edit_phnum = (EditText) findViewById(R.id.editphnum);
-		edit_city = (EditText) findViewById(R.id.editcity);
-		edit_state = (EditText) findViewById(R.id.editstate);
-		edit_country = (EditText) findViewById(R.id.editcountry);
-		edit_zipcode = (EditText) findViewById(R.id.editzip);
-		//edit_cpassw = (EditText) findViewById(R.id.editcpassw);
-		
-		btn1.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub//
-				
-				//Validation check//
-				
-				
-				//go ahed to upload registration data//
-				final RegFieldParams fieldParams = new RegFieldParams();
-				
-				fieldParams.fname = edit_fname.getText().toString().trim();
-				fieldParams.lname = edit_lname.getText().toString().trim();
-				fieldParams.email = edit_email.getText().toString().trim();
-				
-				fieldParams.utype = edit_usertype.getText().toString().trim();
-				
-				fieldParams.phnum = edit_phnum.getText().toString().trim();
-				fieldParams.city = edit_city.getText().toString().trim();
-				fieldParams.state = edit_state.getText().toString().trim();
-				fieldParams.country = edit_country.getText().toString().trim();
-				fieldParams.zipcode = edit_zipcode.getText().toString().trim();
-				
-				if (fieldParams.fname.equals("") || fieldParams.lname.equals("")
-						|| fieldParams.email.equals("") || fieldParams.utype.equals("")
-						|| fieldParams.phnum.equals("") || fieldParams.city.equals("")
-						|| fieldParams.state.equals("") || fieldParams.country.equals("")
-						|| fieldParams.zipcode.equals("")) 
-				{
-					vali = 1;
-					
-					if (fieldParams.fname.equals("")) {
-						//Toast.makeText(Registration.this, "ENTER First",Toast.LENGTH_LONG).show();
-						edit_fname.setError( "First name is required!" );
-
-					}
-					else if (fieldParams.lname.equals("")) {
-						//Toast.makeText(Registration.this, "ENTER USERNAME",	Toast.LENGTH_LONG).show();
-						edit_lname.setError( "Last name is required!" );
-					}
-					else if (fieldParams.email.equals("")) {
-						//Toast.makeText(Registration.this, "ENTER EMAIL ID",Toast.LENGTH_LONG).show();
-						edit_email.setError( "Email is required!" );
-
-					}
-					else if (fieldParams.utype.equals("")) {
-						edit_usertype.setError( "Select usertype!" );
-					}
-					else if (fieldParams.phnum.equals("")) {
-						edit_phnum.setError( "Mobile number required!" );
-					}
-					else if (fieldParams.city.equals("")) {
-						edit_city.setError( "City required!" );
-					}
-					else if (fieldParams.state.equals("")) {
-						edit_state.setError( "State required!" );
-					}
-					else if (fieldParams.country.equals("")) {
-						edit_country.setError( "Country required!" );
-					}
-					else if (fieldParams.zipcode.equals("")) {
-						edit_zipcode.setError( "Zipcode required!" );
-					}
-					else{ }
-					
-				} else {
-					
-					vali = 0;
-					
-					if (!CheckUsername(fieldParams.fname)) {
-						edit_fname.setError( "Invalid First name!" );
-						vali = 1;
-					}
-					if (!CheckUsername(fieldParams.lname)) {
-						edit_lname.setError( "Invalid Last name!" );
-						vali = 1;
-					}
-					if (!CheckEmail(fieldParams.email)) {
-						edit_email.setError( "Invalid Email!" );
-						vali = 1;
-					}
-					if (!Checkalphanumeric(fieldParams.utype)) {
-						edit_phnum.setError( "Invalid Usertype!" );
-						vali = 1;
-					}
-					if (!Checkalphanumeric(fieldParams.phnum)) {
-						edit_phnum.setError( "Invalid Mobile Number!" );
-						vali = 1;
-					}
-					if (!Checkalphanumeric(fieldParams.city)) {
-						edit_city.setError( "Invalid City!" );
-						vali = 1;
-					}
-					if (!Checkalphanumeric(fieldParams.state)) {
-						edit_state.setError( "Invalid State!" );
-						vali = 1;
-					}
-					if (!Checkalphanumeric(fieldParams.country)) {
-						edit_country.setError( "Invalid Country!" );
-						vali = 1;
-					}
-					if (!Checkalphanumeric(fieldParams.zipcode)) {
-						edit_zipcode.setError( "Invalid Zipcode!" );
-						vali = 1;
-					}
-				}
-				
-				if (vali == 0) {
-					RegDataUploadTask regDataUpTask = new RegDataUploadTask();	//call to upload data
-					regDataUpTask.execute(fieldParams);
-				}
-				else {
-					
-				}
-				
-				
-			}
-			
-			private boolean CheckEmail(String email) {
-
-				return EMAIL_PATTERN.matcher(email).matches();
-			}
-
-			private boolean CheckPassword(String password) {
-
-				return PASSWORD_PATTERN.matcher(password).matches();
-			}
-
-			private boolean CheckUsername(String username) {
-
-				return USERNAME_PATTERN.matcher(username).matches();
-			}
-			private boolean Checkalphanumeric(String aphanum) {
-
-				return ALPHANUMERIC.matcher(aphanum).matches();
-			}
-		});
+		// Creating volley request obj
+		JsonObjectRequest jsonObjReq = new JsonObjectRequest(Method.GET,
+                url, null,
+                new Response.Listener<JSONObject>() {
+ 
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+                        
+                        for(int i=0;i<response.length();i++){
+                        	
+                        	try {
+                        		JSONObject obj = response.getJSONObject("data");
+                        		 Log.d(TAG, obj.toString());
+                        		 
+                        		 JSONArray resultArry = obj.getJSONArray("result");
+                                 ArrayList<String> result = new ArrayList<String>();
+                                 Log.d("result", resultArry.toString());
+                                 
+                                 for (int j = 0; j < resultArry.length(); j++) {
+                                	 JSONObject resultObj = (JSONObject) resultArry.get(j);
+                                	 
+                                	 Product product = new Product();
+                                	 product.setTitle(resultObj.getString("pName"));
+                                	 product.setThumbnailUrl("http://phbjharkhand.in/Reverseauction/web/images/" + resultObj.getString("pImage"));
+                                	 product.setRating(resultObj.getString("pBrandName"));
+                                	 product.setYear(resultObj.getString("pRetailPrize"));
+                                	 
+                                	// adding movie to movies array
+     								productList.add(product);
+     								 
+                                	 Log.d("result","------------------" + j +"-------------------");
+                                	 
+                                	 Log.d("Image",resultObj.getString("pImage"));
+                                	 
+                                	 Log.d("ID","" + resultObj.getInt("productId"));
+                                	 Log.d("NAME",resultObj.getString("pName"));
+                                	 Log.d("Brand",resultObj.getString("pBrandName"));
+                                	 Log.d("Type",resultObj.getString("pType"));
+                                	 Log.d("RetailPrize",resultObj.getString("pRetailPrize"));
+                                	 Log.d("Description",resultObj.getString("pDescription"));
+                                	 
+                                	 Log.d("result","-------------------------------------");
+                                	 
+                                 }
+                                 
+                                 adapter.notifyDataSetChanged();
+                        		
+							} catch (Exception e) {
+								// TODO: handle exception
+							}
+                        	
+                        }
+                        
+                        
+                    }
+                }, new Response.ErrorListener() {
+ 
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.d(TAG, "Error: " + error.getMessage());
+                        // hide the progress dialog
+                        
+                    }
+                });
 		
 		
+		// Adding request to request queue
+		AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
 		
 	}
 
-    public void showDialog(View v)
-    {
-    	final CharSequence[] items={"Bidder","Recharger"};
-    	AlertDialog.Builder builder=new AlertDialog.Builder(this);
-    	builder.setTitle("User Type");
-    	
-     	builder.setSingleChoiceItems(items,-1, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
-				LinearLayout ll=(LinearLayout)findViewById(R.id.linear);
-				
-				if("Bidder".equals(items[which]))
-				{
-				edit_usertype.setText("Bidder");
-				dialog.dismiss();
-				}
-				else if("Recharger".equals(items[which]))
-				{
-					edit_usertype.setText("Recharger");
-					dialog.dismiss();
-				}
-			}
-		});
-    	builder.show();
-    
-    }
-	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -258,119 +126,12 @@ public class BidderHome extends Activity {
 	
 
 	
-private class RegDataUploadTask extends
-	AsyncTask<RegFieldParams, Void, String> {
-
-private int TASK;
-
-public RegDataUploadTask() {
-	//this.TASK = task;
-}
-
-@Override
-protected String doInBackground(RegFieldParams... params) {
-		return AppWebService.getInstance().dataUpload(params[0]);
-}
-
-
-@Override
-protected void onPostExecute(String result) {
-	super.onPostExecute(result);
-	
-		JSONObject jsonObject;
-		RegFieldParams fieldParams = new RegFieldParams();
-		try {
-			jsonObject = new JSONObject(result);
-			Log.e("jsonObject in part", jsonObject.toString());
-			
-			 for(int i=0; i<jsonObject.length();i++) {
-				 
-			        JSONObject jsonData = jsonObject.getJSONObject("data");
-			       
-			        String errorMessage = jsonData.getString("errorMessage");
-			        Log.e("errorMessage", errorMessage);
-			        
-			        int errorCode = jsonData.getInt("errorCode");
-			        Log.e("errorCode", "" + errorCode);
-			     
-			        if (errorCode == 0)
-			        {
-			        
-			        		for(int j=0; j<jsonObject.length();j++) {
-						 
-			        			JSONObject results = jsonData.getJSONObject("result");
-				       
-			        			//String errorMess = results.getString("errorMessage");
-			        			Log.e("userId", "" + results.getInt("userId"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeUsrId(results.getInt("userId"));
-			        			
-			        			Log.e("email", results.getString("email"));
-			        			MyPreferences.getInstance(BidderHome.this)
-										.storeUsrEmail(results.getString("email"));
-			        			
-			        			Log.e("fName", results.getString("fName"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeUsrfName(results.getString("fName"));
-			        			
-			        			Log.e("lName", results.getString("lName"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeUsrlName(results.getString("lName"));
-			        			
-			        			Log.e("userType", results.getString("userType"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeUsrType(results.getString("userType"));
-			        			
-			        			Log.e("password", results.getString("password"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storepass( results.getString("password"));
-			        			
-			        			Log.e("Mobile", results.getString("mobile"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeUsrPhoneNum( results.getString("mobile"));
-			        			
-			        			Log.e("city", results.getString("city"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeCity( results.getString("city"));
-			        			
-			        			Log.e("state", results.getString("state"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeState( results.getString("state"));
-			        			
-			        			Log.e("country", results.getString("country"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeCountry( results.getString("country"));
-				       
-			        			
-			        			Log.e("zip_code", results.getString("zipCode"));
-			        			MyPreferences.getInstance(BidderHome.this)
-								.storeCountry( results.getString("zipCode"));
-			        			
-			        			Intent in1 = new Intent(BidderHome.this,Login.class);
-			        			startActivity(in1);
-			        			finish();
-			        			
-			        		}
-			        }
-			        
-			        if (errorCode == 4) {
-			        	edit_email.setError( "Email already used!" );
-						vali = 1;
-			        }
-			        
-			 }
-		
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	
-}
-
-
-}//end of class
 	
 	
-}//end of registration class
+
+	
+	
+}//end of main class
 	
 	
 
